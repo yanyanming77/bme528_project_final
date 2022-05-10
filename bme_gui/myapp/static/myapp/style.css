@@ -1,0 +1,62 @@
+float-container{
+  /* border: 2px solid green; */
+  /* padding: 20px; */
+  display: flex;
+  background-color: #deecfa;
+}
+
+.float-child{
+  /* width:80%; */
+  float: left;
+  /* background-color: bisque; */
+  flex: 1;
+  /* border: 2px solid violet; */
+  margin: 10px;
+}
+
+.slidecontainer {
+width: 90%; /* Width of the outside container */
+margin-left:auto;
+margin-right: auto;
+/* border:2px solid red; */
+}
+
+/* The slider itself */
+.slider {
+-webkit-appearance: none;
+width:30%;
+height: 8px;
+border-radius: 5px;  
+background: #d3d3d3;
+outline: none;
+opacity: 0.7;
+-webkit-transition: .3s;
+transition: opacity .3s;
+}
+
+.slider_two {
+width:20%;
+}
+
+.slider::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 15px;
+height: 15px;
+border-radius: 50%; 
+background: cornflowerblue;
+cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+width: 25px;
+height: 25px;
+border-radius: 50%;
+background: #04AA6D;
+cursor: pointer;
+}
+
+.input_explain {
+margin-left: 20px;
+color: grey;
+}

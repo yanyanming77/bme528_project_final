@@ -1,0 +1,40 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{% static 'myapp/style.css' %}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+        <title>Decision Support System for Radiation Therapy</title>
+
+    </head>
+
+    <body>
+        <div class="container-fluid" style="background-image: url({% static 'myapp/images/bg1.jpeg' %}); background-position: center; display:inline-block; padding-top: 40px; padding-bottom: 70px;">
+            <h1 class="mx-auto" style="width:80%; color:white; border-radius: 25px; text-align: center; font-weight: bold; font-size: 50px;font-family: Trebuchet MS, sans-serif;">Decision support for radiation therapy</h1>
+        </div>
+
+        <nav class="navbar navbar-expand-sm navbar-light" style="background-image: url({% static 'myapp/images/bg3.jpg' %});background-position: top;">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item font-weight-bold" style="font-size: 22px; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"><a href="{% url 'index' %}" class="nav-link">Home Page</a></li>
+                    <li class="nav-item font-weight-bold" style="font-size: 22px; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"><a href="{% url 'similarity_match' %}" class="nav-link">Simlarity Match</a></li>
+                </ul>
+            </div>
+        </nav>
+        {% block main %}
+        {% endblock main%}
+    </body>
+
+</html>

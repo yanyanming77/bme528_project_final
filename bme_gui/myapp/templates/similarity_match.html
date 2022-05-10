@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block main %}
+{% load static %}
+{% load crispy_forms_tags %} 
+
+<div class="container-fluid" style="background-image: url({% static 'myapp/images/bg2.png' %}); padding-bottom: 30px;">
+    <br>
+    {% if user.is_authenticated %}
+      <div class="container" style="text-align: center;">
+        <h4>Hi <span style="font-style: italic; color: #138deb;">{{ user.username }}</span>, You are logged in !</h4>
+        <p><a href="{% url 'logout' %}">Log Out</a></p>
+      </div>
+    {% else %}
+      <h5 style="text-align: center;">You are not logged in</h5>
+      <a href="{% url 'login' %}"></a>
+    {% endif %}
+
+    <!-- upload dicom -->
+    <div class="container" style="background-color: #f6f7f7; padding-bottom: 20px; padding-top: 20px; padding-left: 50px; width: 100%;border: solid 2px green;">
+      <div style="background-color: antiquewhite; padding:10px; text-align: center;">
+        <h3>Upload your DICOM file</h3>
+        <form action="/similarity_match" method="POST" enctype="multipart/form-data" >
+          {% csrf_token %}
+          <div >{{dicom_form.as_table}}</div>
+          <div><button class="btn btn-dark my-4" type="submit">Parse Data</button></div>
+        </form>
+      </div>
+
+      <!-- show parsed results  -->
+      {% if parsed_dicom_from_file|length > 0 %}
+      <div class="container" style="background-color: #e6e6e6; margin-top: 10px; padding-top: 50px; padding-bottom: 50px; margin-left: auto; margin-right: auto; ">
+        <div style="text-align: center;">
+          <h3>Parsed DICOM Result</h3>
+          <!-- allow checking the uploaded file  -->
+          <div style="text-align: center;">
+            <a href="{% url 'stored_sql' %}">
+              <button class="btn btn-primary btn-lg" type="button">Verify Record Storage</button>
+            </a>
+          </div>
+        </div>
+        <div style="padding-left: 50px;">
+          {% for key,value in parsed_dicom_from_file.items %}
+            <li>
+              <span style="font-weight: bold; font-size: 18px;">
+                {{ key }}: 
+              </span>
+              <span style="font-size: 22px; padding-left: 5px; font-style: italic; color: #006bb3;">
+                {{ value }}
+              </span>
+            </li>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+
+    <!-- historical case matching -->
+    <div class="container" style="background-color: #f0f6fc; padding-bottom: 20px; padding-top: 20px; width: 100%; padding-left: 50px; border: solid 2px green; font-size: 19px;">
+
+      <h3>Historical Case Matching</h3>
+        <div style="margin-bottom: 10px; margin-left: 20px;">
+          <h5 style="margin-bottom: -4px;">ROIs</h5><span>Select the ROIs from Brainstem, Cochlea R, Cochlea L, Dental Amalgam, GTV, Lacrimal R, Lens R, Optic Chiasm, Optic Nerve, PTV, Retina R, Teeth</span>
+        </div>
+        <div style="margin-bottom: 10px; margin-left: 20px;">
+          <h5 style="margin-bottom: -4px;">Institution</h5><span>Select institutions from SUNY_B, UCLA, or others</h6>
+        </div>
+        <div style="margin-bottom: 10px; margin-left: 20px;">
+          <h5 style="margin-bottom: -4px;">Criteria</h5><span>Filter your search using similarity score, ROI Dose, PTV Dose, PTV Volume, ROI-ROI Distance and ROI-ROI overlap</span>
+        </div>
+      </div>
+        <!-- Two dropdown bar: ROI and Institution -->
+            <div class="container" style="background-color:#f0f6fc; padding-bottom: 20px; padding-top: 20px; width: 100%;padding-left: 50px; border:2px solid green" >
+              <h4>Filter your search:</h4>
+
+              <!-- form for roi and institution selection -->
+              <form action="/similarity_match" method="GET"  >
+                <div class="container-fluid row" >
+                  {% csrf_token %}
+                  <div class="column form-group" style=" width: 50%; padding-left: 50px;">
+                    <h5>{{forms.roi.label}}</h5>
+                    {{forms.roi}}
+                 </div>
+                 <div class="column form-group" style=" width: 50%; padding-left: 50px;">
+                    <h5>{{forms.institution.label}}</h5>
+                    {{forms.institution}}
+                 </div>
+               </div>
+<!--                    -->
+               <div class="slidecontainer">
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                  <!-- similarity -->
+                  <h5>Similarity</h5>
+                  Greater than  <input class="slider" type="range" min="0" max="100" value="90" id="range_similarity" name="range_similarity">
+                  <span class="input_explain">Similarity greater than: <span id="range_similarity_value" style="color: blue;"></span> % </span>
+                </div>
+                 <!-- roi dose -->
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                  <h5>ROI Dose</h5>
+                  Min  <input class="slider slider_two" type="range" min="0" max="100" value="0" id="ROI_min" name="ROI_min">
+                  Max  <input class="slider slider_two" type="range" min="0" max="100" value="100" id="ROI_max" name="ROI_max">
+                  <span class="input_explain">ROI Dose between <span id="ROI_min_value" style="color: blue;"></span> and <span id="ROI_max_value" style="color: blue;"></span> Gy</span>
+                </div>
+                <!-- ptv dose -->
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                  <h5>PTV Dose</h5>
+                  Min  <input class="slider slider_two" type="range" min="0" max="100" value="0" id="PTV_min" name="PTV_min">
+                  Max  <input class="slider slider_two" type="range" min="0" max="100" value="100" id="PTV_max" name="PTV_max">
+                  <span class="input_explain">PTV Dose between <span id="PTV_min_value" style="color: blue;"></span> and <span id="PTV_max_value" style="color: blue;"></span> Gy</span>
+                </div>
+                <!-- ptv volume -->
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                  <h5>PTV Volume</h5>
+                  Min  <input class="slider slider_two" type="range" min="14" max="294" value="20" id="PTV_volume_min" name="PTV_volume_min">
+                  Max  <input class="slider slider_two" type="range" min="14" max="294" value="290" id="PTV_volume_max" name="PTV_volume_max">
+                  <span class="input_explain">PTV Volume between <span id="PTV_volume_min_value" style="color: blue;"></span> and <span id="PTV_volume_max_value" style="color:blue"></span> mm^3</span>
+                </div>
+                <!-- roi roi distance -->
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                  <h5>ROI-ROI Distance</h5>
+                  Less than  <input class="slider" type="range" min="0" max="99.9" value="99.9" id="ROI-ROI_distance" name="ROI_distance">
+                  <span class="input_explain">ROI-ROI Distance less than: <span id="ROI-ROI_distance_value" style="color: blue;"></span> mm</span>
+                </div>
+                <!-- roi roi overlap -->
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                  <h5>ROI-ROI Overlap</h5>
+                  Less than  <input class="slider" type="range" min="0" max="99.9" value="99.9" id="ROI-ROI_overlap" name="ROI_overlap">
+                  <span class="input_explain">ROI-ROI Overlap less than: <span id="ROI-ROI_overlap_value" style="color: blue;"></span> %</span>
+                </div>
+              </div>
+<!--                        -->
+                <div style="text-align: center; margin-top: 30px;">
+                  <input type="submit" value="Filter Results" class="btn btn-primary btn-lg" name="submit_button"  id="submit_button">
+                </div>
+              </form>
+
+
+
+      <!-- Result Block -->
+      {% if submitbutton %}
+      <div id="result_block" style="display: block;">
+               <!-- result -->
+                <div style="text-align: center;">
+                  <h3>Result of your search</h3>
+                  <div>
+                    <h6 style="text-align: center;">Your criteria: </h6>
+                    <div>
+                    <!-- ROI -->
+                    <span>ROI: </span>
+                    {% if selected_roi == "enter" %}
+                    <span style="color: #8fbc8f;">All Region, </span>
+                    {% else %}
+                    <span style="color: #8fbc8f;">{{selected_roi}}, </span>
+                    {% endif %}
+                    <!-- institution -->
+                    <span>Institution: </span>
+                    {% if selected_institution == "" %}
+                    <span style="color: #8fbc8f;">All, </span>
+                    {% else %}
+                    <span style="color: #8fbc8f;">{{selected_institution}}, </span>
+                    {% endif %}
+                    <span>Similarity >= </span><span style="color: #8fbc8f;">{{selected_similarity_min}}</span>
+                    <!-- ROI dose -->
+                    <span>ROI Dose: </span>
+                    <span style="color: #8fbc8f;">[{{selected_roi_min}}, {{selected_roi_max}}]</span>
+                    <!-- PTV dose -->
+                    <span>PTV Dose: </span>
+                    <span style="color: #8fbc8f;">[{{selected_ptv_min}}, {{selected_ptv_max}}]</span>
+                    </div>
+                    <div>
+                    <!-- PTV Volume -->
+                    <span>PTV Volume: </span>
+                    <span style="color: #8fbc8f;">[{{selected_ptv_volume_min}}, {{selected_ptv_volume_max}}]</span>
+                    <!-- ROI-ROI distance-->
+                    <span>ROI-ROI Distance &lt;= </span>
+                    <span style="color: #8fbc8f;">{{selected_roi_roi_distance}}, </span>
+                    <!-- ROI-ROI overlap -->
+                    <span>ROI-ROI Overlap &lt;= </span>
+                    <span style="color: #8fbc8f;">{{selected_roi_roi_overlap}}</span>
+                    </div>
+                  </div>
+                  <!-- the results are valid -->
+                  {% if flag_df_empty == 0 %}
+                    <!-- line1 -->
+                    <div class="container row" style="margin-left: 0; margin-right: 0; margin-bottom: 10px; margin-top: 10px;">
+                      <div class="column" style="width: 50%;"> 
+                        {% if ptv_dose_plot %}
+                          {% autoescape off %}
+                          {{ptv_dose_plot}}
+                          {% endautoescape %}
+                        {% endif %}
+                      </div>
+                      <div class="column" style="width: 50%;"> 
+                        {% if roi_dose_plot %}
+                          {% autoescape off %}
+                          {{roi_dose_plot}}
+                          {% endautoescape %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <!-- line2 -->
+                    <div class="container row" style="margin-left: 0; margin-right: 0; margin-bottom: 10px; margin-top: 10px;">
+                      <div class="column" style="width: 50%;"> 
+                        {% if ptv_volume_plot %}
+                          {% autoescape off %}
+                          {{ptv_volume_plot}}
+                          {% endautoescape %}
+                        {% endif %}
+                      </div>
+                      <div class="column" style="width: 50%;"> 
+                        {% if rt_dose_plot %}
+                          {% autoescape off %}
+                          {{rt_dose_plot}}
+                          {% endautoescape %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <!-- line3 -->
+                    <div class="container row" style="margin-left: 0; margin-right: 0;margin-top: 10px;">
+                      <div class="column" style="width: 50%;"> 
+                        {% if roi_roi_distance_plot %}
+                          {% autoescape off %}
+                          {{roi_roi_distance_plot}}
+                          {% endautoescape %}
+                        {% endif %}
+                      </div>
+                      <div class="column" style="width: 50%;"> 
+                        {% if roi_roi_overlap_plot %}
+                          {% autoescape off %}
+                          {{roi_roi_overlap_plot}}
+                          {% endautoescape %}
+                        {% endif %}
+                      </div>
+                    </div>
+
+                  <!-- if there's no matching result -->
+                  {% else %}
+                    <h5 style="color: red;">There is no matching result, please change your filters</h5>
+                  {% endif %}
+              </div>
+      </div>      
+      {% endif %}
+
+      </div>
+    </div>  
+ </div>
+
+
+<!-- javascript and jquery -->
+<!-- slide bar -->
+<script type="text/javascript">
+  var similarity_in = document.getElementById("range_similarity");
+  var similarity_out = document.getElementById("range_similarity_value");
+  similarity_out.innerHTML = similarity_in.value;
+  similarity_in.oninput = function() {
+    similarity_out.innerHTML = this.value;
+  }
+  var ROI_min = document.getElementById("ROI_min");
+  var ROI_min_value = document.getElementById("ROI_min_value");
+  ROI_min_value.innerHTML = ROI_min.value;
+  ROI_min.oninput = function() {
+    ROI_min_value.innerHTML = this.value;
+  }
+  var ROI_max = document.getElementById("ROI_max");
+  var ROI_max_value = document.getElementById("ROI_max_value");
+  ROI_max_value.innerHTML = ROI_max.value;
+  ROI_max.oninput = function() {
+    ROI_max_value.innerHTML = this.value;
+  }
+  var PTV_min = document.getElementById("PTV_min");
+  var PTV_min_value = document.getElementById("PTV_min_value");
+  PTV_min_value.innerHTML = PTV_min.value;
+  PTV_min.oninput = function() {
+    PTV_min_value.innerHTML = this.value;
+  }
+  var PTV_max = document.getElementById("PTV_max");
+  var PTV_max_value = document.getElementById("PTV_max_value");
+  PTV_max_value.innerHTML = PTV_max.value;
+  PTV_max.oninput = function() {
+    PTV_max_value.innerHTML = this.value;
+  }
+  var PTV_volume_min = document.getElementById("PTV_volume_min");
+  var PTV_volume_min_value = document.getElementById("PTV_volume_min_value");
+  PTV_volume_min_value.innerHTML = PTV_volume_min.value;
+  PTV_volume_min.oninput = function() {
+    PTV_volume_min_value.innerHTML = this.value;
+  }
+  var PTV_volume_max = document.getElementById("PTV_volume_max");
+  var PTV_volume_max_value = document.getElementById("PTV_volume_max_value");
+  PTV_volume_max_value.innerHTML = PTV_volume_max.value;
+  PTV_volume_max.oninput = function() {
+    PTV_volume_max_value.innerHTML = this.value;
+  }
+  var ROI_distance = document.getElementById("ROI-ROI_distance");
+  var ROI_distance_value = document.getElementById("ROI-ROI_distance_value");
+  ROI_distance_value.innerHTML = ROI_distance.value;
+  ROI_distance.oninput = function() {
+    ROI_distance_value.innerHTML = this.value;
+  }
+  var ROI_overlap = document.getElementById("ROI-ROI_overlap");
+  var ROI_overlap_value = document.getElementById("ROI-ROI_overlap_value");
+  ROI_overlap_value.innerHTML = ROI_overlap.value;
+  ROI_overlap.oninput = function() {
+    ROI_overlap_value.innerHTML = this.value;
+  }
+
+// document.getElementById("submit_button").onclick = function() {
+//     document.getElementById("result_block").style.display = "block";
+// }
+
+</script>
+
+{% endblock %}
