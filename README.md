@@ -5,6 +5,7 @@ What's in it:
 The bme_gui folder contains all the code to run this app
 The requirement.txt contains all the required packages to run the app
 The generate_insert_data.ipynb is the notebook I used to generate dummy data and store them in the SQlite database
+The sample_dcm folder conatins 5 .dcm files to test the functionality of this app
 
 Run the app:
 To run the app, install all the packages listed in the requirements.txt file
