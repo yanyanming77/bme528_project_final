@@ -1,5 +1,5 @@
-# bme528_project_final group 3
-# decision support for radiation therapy
+# BME 528 Project Group3
+# Decision Support for Radiation Therapy
 
 What's in it:
 1. The bme_gui folder contains all the code to run this app
