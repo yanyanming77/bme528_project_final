@@ -1,8 +1,12 @@
 # bme528_project_final group 3
 # decision support for radiation therapy
 
-Run the app:
+What's in it:
 The bme_gui folder contains all the code to run this app
+The requirement.txt contains all the required packages to run the app
+The generate_insert_data.ipynb is the notebook I used to generate dummy data and store them in the SQlite database
+
+Run the app:
 To run the app, install all the packages listed in the requirements.txt file
 After installing all the packages and dependencies, run the following line in the work directory: 
   python manage.py runserver 
